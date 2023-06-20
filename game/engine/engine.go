@@ -1,12 +1,15 @@
 package engine
 
 import (
+	"image/color"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game interface {
 	Name() string
 	Slug() any
+	BackgroundColor() color.Color
 }
 
 type Drawable interface {
@@ -24,6 +27,7 @@ func (e *gameEngine) Objects() []any {
 }
 
 func (e *gameEngine) Draw(screen *ebiten.Image) {
+	screen.Fill(e.game.BackgroundColor())
 	for _, o := range e.Objects() {
 		if d, ok := o.(Drawable); ok {
 			d.Draw(screen)
