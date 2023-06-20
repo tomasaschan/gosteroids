@@ -12,7 +12,7 @@ var _ engine.Game = &asteroids{}
 
 func (a *asteroids) Name() string { return "Asteroids" }
 
-func (a *asteroids) Slug() any {
+func (a *asteroids) Init() any {
 	return &slug{}
 }
 

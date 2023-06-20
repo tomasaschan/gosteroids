@@ -8,7 +8,7 @@ import (
 
 type Game interface {
 	Name() string
-	Slug() any
+	Init() any
 	BackgroundColor() color.Color
 }
 
@@ -41,7 +41,7 @@ func (*gameEngine) Layout(outsideWidth int, outsideHeight int) (screenWidth int,
 
 func (e *gameEngine) Update() error {
 	if e.objects.objects == nil {
-		e.objects.Insert(e.game.Slug())
+		e.objects.Insert(e.game.Init())
 	}
 
 	e.objects.Update(1 / float64(ebiten.TPS()))

@@ -12,6 +12,10 @@ type Ender interface {
 	EndUpdate(dt float64, objects *GameObjects)
 }
 
+func (g *GameObjects) Clear() {
+	g.objects = make([]any, 0)
+}
+
 func (g *GameObjects) Insert(o ...any) {
 	g.objects = append(g.objects, o...)
 }
