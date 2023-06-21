@@ -14,5 +14,5 @@ var _ engine.Ender = &slug{}
 func (s *slug) EndUpdate(dt time.Duration, keys []ebiten.Key, objects *engine.GameObjects) {
 	objects.Clear()
 
-	objects.Insert(NewCoinSlot())
+	objects.Insert(NewCoinSlot(), NewWaveMaker())
 }
