@@ -2,6 +2,7 @@ package engine
 
 import (
 	"image/color"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -44,7 +45,7 @@ func (e *gameEngine) Update() error {
 		e.objects.Insert(e.game.Init())
 	}
 
-	e.objects.Update(1 / float64(ebiten.TPS()))
+	e.objects.Update(time.Duration(1000/float64(ebiten.TPS()))*time.Millisecond)
 
 	return nil
 }

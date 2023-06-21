@@ -1,13 +1,15 @@
 package physics
 
+import "time"
+
 type State struct {
-	X, Y,
-	Vx, Vy,
+	P             Point
+	V             Point
 	Theta, Vtheta float64
 }
 
-func evolve(x, v, dt float64) float64 {
-	x += v * dt
+func evolve(x, v float64, dt time.Duration) float64 {
+	x += v * dt.Seconds()
 	for x < 0 {
 		x += 1024
 	}
@@ -18,9 +20,9 @@ func evolve(x, v, dt float64) float64 {
 	return x
 }
 
-func (s *State) Evolve(dt float64) {
-	s.X = evolve(s.X, s.Vx, dt)
-	s.Y = evolve(s.Y, s.Vy, dt)
+func (s *State) Evolve(dt time.Duration) {
+	s.P.X = evolve(s.P.X, s.V.X, dt)
+	s.P.Y = evolve(s.P.Y, s.V.Y, dt)
 
-	s.Theta += s.Vtheta * dt
+	s.Theta += s.Vtheta * dt.Seconds()
 }

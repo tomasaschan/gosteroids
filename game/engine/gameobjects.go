@@ -1,15 +1,17 @@
 package engine
 
+import (
+	"time"
+)
+
 type GameObjects struct {
 	objects []any
 }
 
-type Beginner interface{ BeginUpdate(dt float64) }
-type Interactor interface {
-	InteractWith(any)
-}
+type Beginner interface{ BeginUpdate() }
+type Interactor interface{ InteractWith(any) }
 type Ender interface {
-	EndUpdate(dt float64, objects *GameObjects)
+	EndUpdate(dt time.Duration, objects *GameObjects)
 }
 
 func (g *GameObjects) Clear() {
@@ -43,10 +45,10 @@ func (g *GameObjects) Pairwise() [][2]any {
 	return results
 }
 
-func (g *GameObjects) Update(dt float64) {
+func (g *GameObjects) Update(dt time.Duration) {
 	for _, o := range g.objects {
 		if b, ok := o.(Beginner); ok {
-			b.BeginUpdate(dt)
+			b.BeginUpdate()
 		}
 
 		for _, pair := range g.Pairwise() {
