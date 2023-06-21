@@ -27,7 +27,9 @@ func (g *GameObjects) Insert(o ...any) {
 func (g *GameObjects) Remove(o any) {
 	for i, x := range g.objects {
 		if x == o {
-			g.objects = append(g.objects[:i], g.objects[i+1:]...)
+			g.objects[i] = g.objects[len(g.objects)-1]
+			g.objects[len(g.objects)-1] = nil
+			g.objects = g.objects[:len(g.objects)-1]
 			return
 		}
 	}
