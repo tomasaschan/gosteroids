@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type Game interface {
@@ -18,8 +19,8 @@ type Drawable interface {
 }
 
 type gameEngine struct {
-	game Game
-
+	game    Game
+	keys    []ebiten.Key
 	objects GameObjects
 }
 
@@ -45,7 +46,9 @@ func (e *gameEngine) Update() error {
 		e.objects.Insert(e.game.Init())
 	}
 
-	e.objects.Update(time.Duration(1000/float64(ebiten.TPS()))*time.Millisecond)
+	e.keys = inpututil.AppendPressedKeys(e.keys[:0])
+
+	e.objects.Update(time.Duration(1000/float64(ebiten.TPS()))*time.Millisecond, e.keys...)
 
 	return nil
 }

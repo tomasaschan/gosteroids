@@ -2,6 +2,8 @@ package engine
 
 import (
 	"time"
+
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type GameObjects struct {
@@ -11,7 +13,7 @@ type GameObjects struct {
 type Beginner interface{ BeginUpdate() }
 type Interactor interface{ InteractWith(any) }
 type Ender interface {
-	EndUpdate(dt time.Duration, objects *GameObjects)
+	EndUpdate(dt time.Duration, pressedKeys []ebiten.Key, objects *GameObjects)
 }
 
 func (g *GameObjects) Clear() {
@@ -45,7 +47,7 @@ func (g *GameObjects) Pairwise() [][2]any {
 	return results
 }
 
-func (g *GameObjects) Update(dt time.Duration) {
+func (g *GameObjects) Update(dt time.Duration, pressedKeys ...ebiten.Key) {
 	for _, o := range g.objects {
 		if b, ok := o.(Beginner); ok {
 			b.BeginUpdate()
@@ -58,7 +60,7 @@ func (g *GameObjects) Update(dt time.Duration) {
 		}
 
 		if e, ok := o.(Ender); ok {
-			e.EndUpdate(dt, g)
+			e.EndUpdate(dt, pressedKeys, g)
 		}
 	}
 }
