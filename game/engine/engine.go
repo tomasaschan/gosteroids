@@ -8,6 +8,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+const ScreenSize = 1024
+
 type Game interface {
 	Name() string
 	Init() any
@@ -38,7 +40,7 @@ func (e *gameEngine) Draw(screen *ebiten.Image) {
 }
 
 func (*gameEngine) Layout(outsideWidth int, outsideHeight int) (screenWidth int, screenHeight int) {
-	return 1024, 1024
+	return ScreenSize, ScreenSize
 }
 
 func (e *gameEngine) Update() error {
