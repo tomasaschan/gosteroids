@@ -7,22 +7,8 @@ import (
 	ebiten "github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/tomasaschan/gosteroids/game/engine"
-	"github.com/tomasaschan/gosteroids/resources/fonts"
 	"golang.org/x/exp/slices"
-	"golang.org/x/image/font"
 )
-
-var (
-	atariFont font.Face
-)
-
-func init() {
-	var err error
-	atariFont, err = fonts.AtariFont()
-	if err != nil {
-		panic(err)
-	}
-}
 
 type coinSlot struct{}
 
