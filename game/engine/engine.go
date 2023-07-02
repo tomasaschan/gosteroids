@@ -1,10 +1,12 @@
 package engine
 
 import (
+	"fmt"
 	"image/color"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
@@ -37,6 +39,7 @@ func (e *gameEngine) Draw(screen *ebiten.Image) {
 			d.Draw(screen)
 		}
 	}
+	ebitenutil.DebugPrint(screen, fmt.Sprint(ebiten.ActualTPS()))
 }
 
 func (*gameEngine) Layout(outsideWidth int, outsideHeight int) (screenWidth int, screenHeight int) {
