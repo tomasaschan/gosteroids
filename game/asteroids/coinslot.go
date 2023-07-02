@@ -33,6 +33,6 @@ func (coinSlot) Draw(screen *ebiten.Image) {
 	for line, message := range messages {
 		bbox := text.BoundString(atariFont, message)
 
-		text.Draw(screen, message, atariFont, 1024/2-bbox.Dx()/2, int(800+1.5*float64(line*bbox.Dy())), color.White)
+		text.Draw(screen, message, atariFont, engine.ScreenSize/2-bbox.Dx()/2, int(engine.ScreenSize*2/3+1.5*float64(line*bbox.Dy())), color.White)
 	}
 }

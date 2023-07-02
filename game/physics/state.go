@@ -1,6 +1,10 @@
 package physics
 
-import "time"
+import (
+	"time"
+
+	"github.com/tomasaschan/gosteroids/game/engine"
+)
 
 type State struct {
 	P             Point
@@ -11,10 +15,10 @@ type State struct {
 func evolve(x, v float64, dt time.Duration) float64 {
 	x += v * dt.Seconds()
 	for x < 0 {
-		x += 1024
+		x += engine.ScreenSize
 	}
-	for 1024 < x {
-		x -= 1024
+	for engine.ScreenSize < x {
+		x -= engine.ScreenSize
 	}
 
 	return x
