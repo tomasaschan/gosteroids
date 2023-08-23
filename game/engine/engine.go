@@ -1,67 +1,84 @@
 package engine
 
 import (
-	"fmt"
 	"image/color"
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/pixelgl"
+	"golang.org/x/image/colornames"
 )
 
 const ScreenSize = 1024
 
 type Game interface {
 	Name() string
-	Init() any
+	Init() []any
 	BackgroundColor() color.Color
 }
 
 type Drawable interface {
-	Draw(*ebiten.Image)
+	Draw(pixel.Target)
 }
 
 type gameEngine struct {
+	window *pixelgl.Window
+
 	game    Game
-	keys    []ebiten.Key
+	keys    []Key
 	objects GameObjects
-}
-
-func (e *gameEngine) Objects() []any {
-	return e.objects.objects
-}
-
-func (e *gameEngine) Draw(screen *ebiten.Image) {
-	screen.Fill(e.game.BackgroundColor())
-	for _, o := range e.Objects() {
-		if d, ok := o.(Drawable); ok {
-			d.Draw(screen)
-		}
-	}
-	ebitenutil.DebugPrint(screen, fmt.Sprint(ebiten.ActualTPS()))
 }
 
 func (*gameEngine) Layout(outsideWidth int, outsideHeight int) (screenWidth int, screenHeight int) {
 	return ScreenSize, ScreenSize
 }
 
-func (e *gameEngine) Update() error {
+func (e *gameEngine) Update(dt time.Duration, pressedKeys []Key, justPressedKeys []Key) {
 	if e.objects.objects == nil {
-		e.objects.Insert(e.game.Init())
+		e.objects.Insert(e.game.Init()...)
 	}
 
-	e.keys = inpututil.AppendPressedKeys(e.keys[:0])
-
-	e.objects.Update(time.Duration(1000/float64(ebiten.TPS()))*time.Millisecond, e.keys...)
-
-	return nil
+	e.objects.Update(dt, pressedKeys, justPressedKeys)
 }
 
-var _ ebiten.Game = &gameEngine{}
+func (e *gameEngine) RunFrame(dt time.Duration) {
+	pressed, justPressed := KeyboardInput(e.window)
+	e.window.Canvas().Clear(colornames.Midnightblue)
 
-func Run(g Game) error {
-	ebiten.SetWindowTitle(g.Name())
+	e.Update(dt, pressed, justPressed)
+	e.objects.Draw(e.window.Canvas())
 
-	return ebiten.RunGame(&gameEngine{game: g})
+	e.window.Update()
+}
+
+func (e *gameEngine) Running() bool {
+	return !e.window.Closed()
+}
+
+func NewEngine(g Game) *gameEngine {
+	cfg := pixelgl.WindowConfig{
+		Title:  g.Name(),
+		Bounds: pixel.R(0, 0, ScreenSize, ScreenSize),
+		VSync:  true,
+	}
+
+	win, err := pixelgl.NewWindow(cfg)
+	if err != nil {
+		panic(err)
+	}
+
+	return &gameEngine{game: g, window: win}
+}
+
+func Run(g Game) {
+	pixelgl.Run(func() {
+		engine := NewEngine(g)
+
+		last := time.Now()
+		for engine.Running() {
+			dt := time.Since(last)
+			last = time.Now()
+			engine.RunFrame(dt)
+		}
+	})
 }

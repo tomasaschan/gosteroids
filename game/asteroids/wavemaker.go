@@ -3,7 +3,6 @@ package asteroids
 import (
 	"time"
 
-	ebiten "github.com/hajimehoshi/ebiten/v2"
 	"github.com/tomasaschan/gosteroids/game/engine"
 )
 
@@ -20,9 +19,9 @@ type waveMaker struct {
 	timer        engine.Timer
 }
 
-var _ engine.Beginner = &waveMaker{}
-var _ engine.Interactor = &waveMaker{}
-var _ engine.Ender = &waveMaker{}
+var _ engine.Beginner = NewWaveMaker()
+var _ engine.Interactor = NewWaveMaker()
+var _ engine.Ender = NewWaveMaker()
 
 func NewWaveMaker() *waveMaker {
 	return &waveMaker{
@@ -37,12 +36,12 @@ func (w *waveMaker) BeginUpdate() {
 }
 
 func (w *waveMaker) InteractWith(other any) {
-	if _, ok := other.(*Asteroid); ok {
+	if _, ok := other.(*asteroid); ok {
 		w.anyAsteroids = true
 	}
 }
 
-func (w *waveMaker) EndUpdate(dt time.Duration, pressedKeys []ebiten.Key, objects *engine.GameObjects) {
+func (w *waveMaker) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	if w.anyAsteroids {
 		// there are asteroids present; exit early
 		return
@@ -50,8 +49,7 @@ func (w *waveMaker) EndUpdate(dt time.Duration, pressedKeys []ebiten.Key, object
 
 	w.timer.Tick(dt, func() {
 		for i := 0; i < w.waveSize; i++ {
-			a := NewAsteroid()
-			objects.Insert(a)
+			objects.Insert(NewAsteroid())
 		}
 
 		w.waveSize += WaveSizeIncrement

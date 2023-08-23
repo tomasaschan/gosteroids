@@ -3,7 +3,7 @@ package engine
 import (
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/faiface/pixel"
 )
 
 type GameObjects struct {
@@ -13,7 +13,10 @@ type GameObjects struct {
 type Beginner interface{ BeginUpdate() }
 type Interactor interface{ InteractWith(any) }
 type Ender interface {
-	EndUpdate(dt time.Duration, pressedKeys []ebiten.Key, objects *GameObjects)
+	EndUpdate(dt time.Duration, objects *GameObjects)
+}
+type Controlled interface {
+	Control(pressedKeys []Key, justPressedKeys []Key)
 }
 
 func (g *GameObjects) Clear() {
@@ -49,7 +52,7 @@ func (g *GameObjects) Pairwise() [][2]any {
 	return results
 }
 
-func (g *GameObjects) Update(dt time.Duration, pressedKeys ...ebiten.Key) {
+func (g *GameObjects) Update(dt time.Duration, pressedKeys []Key, justPressedKeys []Key) {
 	for _, o := range g.objects {
 		if b, ok := o.(Beginner); ok {
 			b.BeginUpdate()
@@ -61,8 +64,21 @@ func (g *GameObjects) Update(dt time.Duration, pressedKeys ...ebiten.Key) {
 			}
 		}
 
+		if e, ok := o.(Controlled); ok {
+			e.Control(pressedKeys, justPressedKeys)
+		}
+
 		if e, ok := o.(Ender); ok {
-			e.EndUpdate(dt, pressedKeys, g)
+			e.EndUpdate(dt, g)
+		}
+	}
+}
+
+func (g *GameObjects) Draw(target pixel.Target) {
+
+	for _, o := range g.objects {
+		if d, ok := o.(Drawable); ok {
+			d.Draw(target)
 		}
 	}
 }
