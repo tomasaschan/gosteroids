@@ -3,7 +3,6 @@ package asteroids
 import (
 	"time"
 
-	ebiten "github.com/hajimehoshi/ebiten/v2"
 	"github.com/tomasaschan/gosteroids/game/engine"
 	"github.com/tomasaschan/gosteroids/game/physics"
 )
@@ -14,7 +13,7 @@ const (
 )
 
 var (
-	SaucerInitialVelocity = physics.Point{150, 0}
+	SaucerInitialVelocity = physics.Point{X: 150, Y: 0}
 )
 
 type saucerMaker struct {
@@ -40,17 +39,17 @@ func (s *saucerMaker) InteractWith(other any) {
 	}
 }
 
-func (s *saucerMaker) EndUpdate(dt time.Duration, pressedKeys []ebiten.Key, objects *engine.GameObjects) {
+func (s *saucerMaker) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	if !s.saucerPresent {
 		s.timer.Tick(dt, func() {
-			objects.Insert(NewSaucer(
-				physics.Point{X: 0, Y: engine.ScreenSize / 2},
-				SaucerInitialVelocity,
-			))
+			// objects.Insert(NewSaucer(
+			// 	physics.Point{X: 0, Y: engine.ScreenSize / 2},
+			// 	SaucerInitialVelocity,
+			// ))
 		})
 	}
 }
 
-var _ engine.Beginner = &saucerMaker{}
-var _ engine.Interactor = &saucerMaker{}
-var _ engine.Ender = &saucerMaker{}
+var _ engine.Beginner = NewSaucerMaker()
+var _ engine.Interactor = NewSaucerMaker()
+var _ engine.Ender = NewSaucerMaker()

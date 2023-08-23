@@ -12,6 +12,13 @@ type State struct {
 	Theta, Vtheta float64
 }
 
+func S0(x, y, theta float64) State {
+	return State{
+		P:     P(x, y),
+		Theta: theta,
+	}
+}
+
 func evolve(x, v float64, dt time.Duration) float64 {
 	x += v * dt.Seconds()
 	for x < 0 {

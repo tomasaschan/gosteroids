@@ -5,38 +5,44 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/tomasaschan/gosteroids/game/engine"
 	"github.com/tomasaschan/gosteroids/game/physics"
 )
 
-type Asteroid struct {
+type asteroid struct {
 	State physics.State
 }
 
-var _ engine.Interactor = &Asteroid{}
-var _ engine.Ender = &Asteroid{}
-var _ engine.Drawable = &Asteroid{}
+var _ engine.Interactor = NewAsteroid()
+var _ engine.Ender = NewAsteroid()
+var _ engine.Drawable = NewAsteroid()
 
-func NewAsteroid() *Asteroid {
+func NewAsteroid() *asteroid {
 	p := physics.Point{X: 0, Y: rand.Float64() * engine.ScreenSize}
 	v := physics.Point{X: 100, Y: 0}.Rotate(rand.Float64() * 360)
 
-	a := &Asteroid{State: physics.State{P: p, V: v, Theta: 0, Vtheta: 10}}
+	a := &asteroid{State: physics.State{P: p, V: v, Theta: 0, Vtheta: 10}}
 	// ensure asteroid appears on the correct side of the screen on first draw
 	a.State.Evolve(1 * time.Millisecond)
 
 	return a
 }
 
-func (a *Asteroid) InteractWith(other any) {
+func (a *asteroid) InteractWith(other any) {
 }
 
-func (a *Asteroid) EndUpdate(dt time.Duration, pressedKeys []ebiten.Key, objects *engine.GameObjects) {
+func (a *asteroid) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	a.State.Evolve(dt)
 }
 
-func (a *Asteroid) Draw(screen *ebiten.Image) {
-	vector.DrawFilledCircle(screen, float32(a.State.P.X), float32(a.State.P.Y), 15, color.White, false)
+func (a *asteroid) Draw(screen pixel.Target) {
+	imd := imdraw.New(nil)
+
+	imd.Color = color.White
+	imd.Push(pixel.Vec(a.State.P))
+	imd.Circle(15, 0)
+
+	imd.Draw(screen)
 }
