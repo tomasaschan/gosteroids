@@ -14,5 +14,5 @@ I also made some minor changes to the game engine design; I'll write something u
 
 With this, I think I'm ready to start actually implementing Asteroids!
 
-[Ebiten]
-[Pixel]
+[Ebiten]: https://ebitengine.org/
+[Pixel]: https://github.com/faiface/pixel
