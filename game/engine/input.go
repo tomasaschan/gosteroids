@@ -10,17 +10,21 @@ type Key int
 // Instead, we just list the ones we actually make use of.
 // This might be an opportunity to learn how go source generators work.
 const (
-	KeyQ = Key(pixelgl.KeyQ)
+	KeyQ          = Key(pixelgl.KeyQ)
+	KeyLeftArrow  = Key(pixelgl.KeyLeft)
+	KeyRightArrow = Key(pixelgl.KeyRight)
+	KeyUpArrow    = Key(pixelgl.KeyUp)
 )
 
-var (
-	keys = map[Key]bool{
-		KeyQ: true,
-	}
-)
+var keys = []Key{
+	KeyQ,
+	KeyLeftArrow,
+	KeyRightArrow,
+	KeyUpArrow,
+}
 
 func KeyboardInput(w *pixelgl.Window) (pressedKeys []Key, justPressedKeys []Key) {
-	for key := range keys {
+	for _, key := range keys {
 		if w.Pressed(pixelgl.Button(key)) {
 			pressedKeys = append(pressedKeys, key)
 		}

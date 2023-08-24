@@ -32,6 +32,7 @@ func (c *coinSlot) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 		objects.Insert(
 			NewWaveMaker(),
 			NewSaucerMaker(),
+			NewShipMaker(),
 		)
 	}
 }

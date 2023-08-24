@@ -12,7 +12,7 @@ type State struct {
 	Theta, Vtheta float64
 }
 
-func S0(x, y, theta float64) State {
+func NewStationary(x, y, theta float64) State {
 	return State{
 		P:     P(x, y),
 		Theta: theta,
