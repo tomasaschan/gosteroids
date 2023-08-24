@@ -12,13 +12,15 @@ import (
 )
 
 type ship struct {
-	State    physics.State
-	boosting bool
+	State     physics.State
+	boosting  bool
+	dropScale float64
 }
 
 func NewShip() *ship {
 	return &ship{
-		State: physics.NewStationary(engine.ScreenSize/2, engine.ScreenSize/2, math.Pi/2),
+		State:     physics.NewStationary(engine.ScreenSize/2, engine.ScreenSize/2, math.Pi/2),
+		dropScale: 50,
 	}
 }
 
@@ -43,16 +45,23 @@ func (s *ship) Control(pressedKeys []engine.Key, justPressedKeys []engine.Key) {
 }
 
 func (s *ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+	if s.dropScale > 1 {
+		s.dropScale -= dt.Seconds() * 100
+		return
+	} else if s.dropScale < 1 {
+		s.dropScale = 1
+	}
+
 	s.State.Evolve(dt)
 }
 
 func (s *ship) Draw(target pixel.Target) {
 	imd := imdraw.New(nil)
-	imd.SetMatrix(pixel.IM.Rotated(pixel.ZV, s.State.Theta).Scaled(pixel.ZV, 5).Moved(pixel.Vec(s.State.P)))
+	imd.SetMatrix(pixel.IM.Rotated(pixel.ZV, s.State.Theta).Scaled(pixel.ZV, 5*s.dropScale).Moved(pixel.Vec(s.State.P)))
 	imd.Push(pixel.V(-3, -2), pixel.V(-3, 2), pixel.V(-5, 4), pixel.V(7, 0), pixel.V(-5, -4), pixel.V(-3, -2))
 	imd.Polygon(1)
 
-	if s.boosting {
+	if s.boosting && s.dropScale == 1 {
 		imd.Push(pixel.V(-3, -2), pixel.V(-7, 0), pixel.V(-3, 2))
 		imd.Polygon(1)
 	}
