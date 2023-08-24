@@ -6,7 +6,6 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"golang.org/x/image/colornames"
 )
 
 const ScreenSize = 1024
@@ -43,7 +42,7 @@ func (e *gameEngine) Update(dt time.Duration, pressedKeys []Key, justPressedKeys
 
 func (e *gameEngine) RunFrame(dt time.Duration) {
 	pressed, justPressed := KeyboardInput(e.window)
-	e.window.Canvas().Clear(colornames.Midnightblue)
+	e.window.Canvas().Clear(e.game.BackgroundColor())
 
 	e.Update(dt, pressed, justPressed)
 	e.objects.Draw(e.window.Canvas())

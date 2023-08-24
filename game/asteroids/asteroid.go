@@ -1,7 +1,6 @@
 package asteroids
 
 import (
-	"image/color"
 	"math/rand"
 	"time"
 
@@ -40,7 +39,6 @@ func (a *asteroid) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 func (a *asteroid) Draw(screen pixel.Target) {
 	imd := imdraw.New(nil)
 
-	imd.Color = color.White
 	imd.Push(pixel.Vec(a.State.P))
 	imd.Circle(15, 0)
 
