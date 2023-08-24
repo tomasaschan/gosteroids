@@ -11,10 +11,13 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+const shipRadius = 35
+
 type ship struct {
 	State     physics.State
 	boosting  bool
 	dropScale float64
+	colliding bool
 }
 
 func NewShip() *ship {
@@ -24,9 +27,18 @@ func NewShip() *ship {
 	}
 }
 
+var _ engine.Interactor = NewShip()
 var _ engine.Controlled = NewShip()
 var _ engine.Ender = NewShip()
 var _ engine.Drawable = NewShip()
+
+func (s *ship) InteractWith(other any) {
+	if asteroid, ok := other.(*asteroid); ok {
+		if asteroid.CollidingWith(s.State.P, shipRadius) {
+			s.colliding = true
+		}
+	}
+}
 
 func (s *ship) Control(pressedKeys []engine.Key, justPressedKeys []engine.Key) {
 	s.boosting = false
@@ -52,18 +64,25 @@ func (s *ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 		s.dropScale = 1
 	}
 
+	if s.colliding {
+		objects.Remove(s)
+		return
+	}
+
 	s.State.Evolve(dt)
+	s.colliding = false
 }
 
 func (s *ship) Draw(target pixel.Target) {
 	imd := imdraw.New(nil)
-	imd.SetMatrix(pixel.IM.Rotated(pixel.ZV, s.State.Theta).Scaled(pixel.ZV, 5*s.dropScale).Moved(pixel.Vec(s.State.P)))
-	imd.Push(pixel.V(-3, -2), pixel.V(-3, 2), pixel.V(-5, 4), pixel.V(7, 0), pixel.V(-5, -4), pixel.V(-3, -2))
-	imd.Polygon(1)
+
+	imd.SetMatrix(pixel.IM.Rotated(pixel.ZV, s.State.Theta).Scaled(pixel.ZV, s.dropScale).Moved(pixel.Vec(s.State.P)))
+	imd.Push(pixel.V(-15, -10), pixel.V(-15, 10), pixel.V(-25, 20), pixel.V(35, 0), pixel.V(-25, -20), pixel.V(-15, -10))
+	imd.Polygon(4)
 
 	if s.boosting && s.dropScale == 1 {
-		imd.Push(pixel.V(-3, -2), pixel.V(-7, 0), pixel.V(-3, 2))
-		imd.Polygon(1)
+		imd.Push(pixel.V(-15, -10), pixel.V(-35, 0), pixel.V(-15, 10))
+		imd.Polygon(4)
 	}
 
 	imd.Draw(target)

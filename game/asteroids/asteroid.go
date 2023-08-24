@@ -11,7 +11,8 @@ import (
 )
 
 type asteroid struct {
-	State physics.State
+	State  physics.State
+	radius float64
 }
 
 var _ engine.Interactor = NewAsteroid()
@@ -22,7 +23,10 @@ func NewAsteroid() *asteroid {
 	p := physics.Point{X: 0, Y: rand.Float64() * engine.ScreenSize}
 	v := physics.Point{X: 100, Y: 0}.Rotate(rand.Float64() * 360)
 
-	a := &asteroid{State: physics.State{P: p, V: v, Theta: 0, Vtheta: 10}}
+	a := &asteroid{
+		State:  physics.State{P: p, V: v, Theta: 0, Vtheta: 10},
+		radius: 15,
+	}
 	// ensure asteroid appears on the correct side of the screen on first draw
 	a.State.Evolve(1 * time.Millisecond)
 
@@ -40,7 +44,11 @@ func (a *asteroid) Draw(screen pixel.Target) {
 	imd := imdraw.New(nil)
 
 	imd.Push(pixel.Vec(a.State.P))
-	imd.Circle(15, 0)
+	imd.Circle(a.radius, 0)
 
 	imd.Draw(screen)
+}
+
+func (a *asteroid) CollidingWith(otherLocation physics.Point, otherRadius float64) bool {
+	return a.State.P.DistanceTo(otherLocation) < otherRadius+a.radius
 }
