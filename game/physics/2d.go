@@ -16,11 +16,19 @@ func (p Point) Add(q Point) Point {
 	return P(p.X+q.X, p.Y+q.Y)
 }
 
+func (p Point) Sub(q Point) Point {
+	return P(p.X-q.X, p.Y-q.Y)
+}
+
+func (p Point) Length() float64 {
+	return math.Sqrt(math.Pow(p.X, 2) + math.Pow(p.Y, 2))
+}
+
 func (p Point) Normalize() Point {
 	if p.X == 0 && p.Y == 0 {
 		return p
 	}
-	return p.Scale(1 / math.Sqrt(math.Pow(p.X, 2)+math.Pow(p.Y, 2)))
+	return p.Scale(1 / p.Length())
 }
 
 func (p Point) Scale(k float64) Point {
