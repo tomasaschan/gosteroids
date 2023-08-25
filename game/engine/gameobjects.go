@@ -82,3 +82,13 @@ func (g *GameObjects) Draw(target pixel.Target) {
 		}
 	}
 }
+
+func (g *GameObjects) ObjectsMatching(predicate func(any) bool) (results []any) {
+	for _, o := range g.objects {
+		if predicate(o) {
+			results = append(results, o)
+		}
+	}
+
+	return
+}

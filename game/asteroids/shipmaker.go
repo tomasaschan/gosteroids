@@ -25,7 +25,7 @@ var _ engine.Interactor = NewShipMaker()
 var _ engine.Ender = NewShipMaker()
 
 func (s *shipMaker) InteractWith(other any) {
-	if _, ok := other.(*ship); ok {
+	if _, ok := other.(*Ship); ok {
 		s.seenShip = true
 	}
 }

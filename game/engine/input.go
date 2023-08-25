@@ -35,3 +35,5 @@ func KeyboardInput(w *pixelgl.Window) (pressedKeys []Key, justPressedKeys []Key)
 
 	return
 }
+
+var NoInput = []Key{}

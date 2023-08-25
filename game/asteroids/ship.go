@@ -13,15 +13,15 @@ import (
 
 const shipRadius = 35
 
-type ship struct {
+type Ship struct {
 	State     physics.State
 	boosting  bool
 	dropScale float64
 	colliding bool
 }
 
-func NewShip() *ship {
-	return &ship{
+func NewShip() *Ship {
+	return &Ship{
 		State:     physics.NewStationary(engine.ScreenSize/2, engine.ScreenSize/2, math.Pi/2),
 		dropScale: 50,
 	}
@@ -32,7 +32,7 @@ var _ engine.Controlled = NewShip()
 var _ engine.Ender = NewShip()
 var _ engine.Drawable = NewShip()
 
-func (s *ship) InteractWith(other any) {
+func (s *Ship) InteractWith(other any) {
 	if asteroid, ok := other.(*asteroid); ok {
 		if asteroid.CollidingWith(s.State.P, shipRadius) {
 			s.colliding = true
@@ -40,7 +40,7 @@ func (s *ship) InteractWith(other any) {
 	}
 }
 
-func (s *ship) Control(pressedKeys []engine.Key, justPressedKeys []engine.Key) {
+func (s *Ship) Control(pressedKeys []engine.Key, justPressedKeys []engine.Key) {
 	s.boosting = false
 	s.State.Vtheta = 0
 
@@ -56,7 +56,7 @@ func (s *ship) Control(pressedKeys []engine.Key, justPressedKeys []engine.Key) {
 	}
 }
 
-func (s *ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (s *Ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	if s.dropScale > 1 {
 		s.dropScale -= dt.Seconds() * 100
 		return
@@ -73,7 +73,7 @@ func (s *ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	s.colliding = false
 }
 
-func (s *ship) Draw(target pixel.Target) {
+func (s *Ship) Draw(target pixel.Target) {
 	imd := imdraw.New(nil)
 
 	imd.SetMatrix(pixel.IM.Rotated(pixel.ZV, s.State.Theta).Scaled(pixel.ZV, s.dropScale).Moved(pixel.Vec(s.State.P)))
