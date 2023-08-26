@@ -44,6 +44,7 @@ func (f *LineFragment) EndUpdate(dt time.Duration, objects *engine.GameObjects) 
 
 func NewLineFragment(state physics.State, a, b pixel.Vec) *LineFragment {
 	state.Vtheta += 2*rand.Float64() - 1
+	state.V = state.V.Add(randomAdjustment())
 	return &LineFragment{
 		State: state,
 		a:     a,
