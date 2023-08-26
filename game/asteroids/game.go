@@ -15,7 +15,7 @@ func (a *asteroids) Name() string { return "Asteroids" }
 func (a *asteroids) Init() []any {
 	return []any{
 		NewCoinSlot(),
-		NewWaveMaker(),
+		NewAttractModeWaveMaker(),
 		NewSaucerMaker(),
 	}
 }

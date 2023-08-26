@@ -1,6 +1,7 @@
 package asteroids
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/tomasaschan/gosteroids/game/engine"
@@ -15,24 +16,27 @@ const (
 
 type waveMaker struct {
 	anyAsteroids bool
-	waveSize     int
+	wave         int
+	messageShown bool
+	attractMode  bool
 	timer        engine.Timer
 }
 
-var _ engine.Beginner = NewWaveMaker()
 var _ engine.Interactor = NewWaveMaker()
 var _ engine.Ender = NewWaveMaker()
+
+func NewAttractModeWaveMaker() *waveMaker {
+	wm := NewWaveMaker()
+	wm.attractMode = true
+	return wm
+}
 
 func NewWaveMaker() *waveMaker {
 	return &waveMaker{
 		anyAsteroids: false,
-		waveSize:     InitialWaveSize,
+		wave:         1,
 		timer:        engine.NewTimer(AsteroidDelay),
 	}
-}
-
-func (w *waveMaker) BeginUpdate() {
-	w.anyAsteroids = false
 }
 
 func (w *waveMaker) InteractWith(other any) {
@@ -43,18 +47,28 @@ func (w *waveMaker) InteractWith(other any) {
 
 func (w *waveMaker) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	if w.anyAsteroids {
-		// there are asteroids present; exit early
+		// there are asteroids present; reset and exit early
+		w.anyAsteroids = false
 		return
 	}
 
+	if !w.attractMode && !w.messageShown {
+		objects.Insert(NewMessage(fmt.Sprint("Get ready for Wave ", w.wave), AsteroidDelay-1*time.Second))
+		w.messageShown = true
+	}
+
 	w.timer.Tick(dt, func() {
-		for i := 0; i < w.waveSize; i++ {
-			objects.Insert(NewAsteroid())
+		waveSize := InitialWaveSize + (w.wave-1)*WaveSizeIncrement
+		if waveSize > MaxWaveSize {
+			waveSize = MaxWaveSize
 		}
 
-		w.waveSize += WaveSizeIncrement
-		if w.waveSize > MaxWaveSize {
-			w.waveSize = MaxWaveSize
+		for i := 0; i < waveSize; i++ {
+			objects.Insert(NewAsteroid())
 		}
+		w.wave++
+		w.messageShown = false
 	})
+
+	w.anyAsteroids = false
 }
