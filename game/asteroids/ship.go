@@ -11,7 +11,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-const shipRadius = 35
+const shipRadius = 25
 
 var ShipPoints = []pixel.Vec{
 	pixel.V(-15, -10),
@@ -20,6 +20,11 @@ var ShipPoints = []pixel.Vec{
 	pixel.V(35, 0),
 	pixel.V(-25, -20),
 	pixel.V(-15, -10),
+}
+var BurstPoints = []pixel.Vec{
+	pixel.V(-15, -10),
+	pixel.V(-35, 0),
+	pixel.V(-15, 10),
 }
 
 type Ship struct {
@@ -99,7 +104,7 @@ func (s *Ship) Draw(target pixel.Target) {
 	imd.Polygon(4)
 
 	if s.boosting {
-		imd.Push(pixel.V(-15, -10), pixel.V(-35, 0), pixel.V(-15, 10))
+		imd.Push(BurstPoints...)
 		imd.Polygon(4)
 	}
 
