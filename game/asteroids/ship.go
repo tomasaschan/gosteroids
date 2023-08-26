@@ -13,7 +13,7 @@ import (
 
 const shipRadius = 35
 
-var shipPoints = []pixel.Vec{
+var ShipPoints = []pixel.Vec{
 	pixel.V(-15, -10),
 	pixel.V(-15, 10),
 	pixel.V(-25, 20),
@@ -86,8 +86,11 @@ func (s *Ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 func (s *Ship) Draw(target pixel.Target) {
 	imd := imdraw.New(nil)
 
-	imd.SetMatrix(pixel.IM.Rotated(pixel.ZV, s.State.Theta).Scaled(pixel.ZV, s.dropScale).Moved(pixel.Vec(s.State.P)))
-	imd.Push(shipPoints...)
+	imd.SetMatrix(pixel.IM.
+		Rotated(pixel.ZV, s.State.Theta).
+		Scaled(pixel.ZV, s.dropScale).
+		Moved(pixel.Vec(s.State.P)))
+	imd.Push(ShipPoints...)
 	imd.Polygon(4)
 
 	if s.boosting && s.dropScale == 1 {
@@ -99,8 +102,8 @@ func (s *Ship) Draw(target pixel.Target) {
 }
 
 func (s *Ship) Eplode() (result []any) {
-	for i := 0; i < len(shipPoints)-1; i++ {
-		result = append(result, LineFragment(s.State, physics.Point(shipPoints[i]), physics.Point(shipPoints[i+1])))
+	for i := 0; i < len(ShipPoints)-1; i++ {
+		result = append(result, NewLineFragment(s.State, ShipPoints[i], ShipPoints[i+1]))
 	}
 
 	return

@@ -13,25 +13,25 @@ import (
 
 const FragmentLifetime = 5 * time.Second
 
-type lineFragment struct {
-	state  physics.State
-	length float64
-	age    time.Duration
+type LineFragment struct {
+	State physics.State
+	a, b  pixel.Vec
+	age   time.Duration
 }
 
-var _ engine.Drawable = &lineFragment{}
-var _ engine.Ender = &lineFragment{}
+var _ engine.Drawable = &LineFragment{}
+var _ engine.Ender = &LineFragment{}
 
-func (f *lineFragment) Draw(target pixel.Target) {
+func (f *LineFragment) Draw(target pixel.Target) {
 	imd := imdraw.New(nil)
-	imd.SetMatrix(pixel.IM.Rotated(pixel.ZV, f.state.Theta).Moved(pixel.Vec(f.state.P)))
-	imd.Push(pixel.V(-f.length/2, 0), pixel.V(f.length/2, 0))
+	imd.SetMatrix(pixel.IM.Rotated(pixel.ZV, f.State.Theta).Moved(pixel.Vec(f.State.P)))
+	imd.Push(f.a, f.b)
 	imd.Line(4)
 
 	imd.Draw(target)
 }
 
-func (f *lineFragment) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (f *LineFragment) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	f.age += dt
 
 	if f.age > FragmentLifetime {
@@ -39,26 +39,15 @@ func (f *lineFragment) EndUpdate(dt time.Duration, objects *engine.GameObjects) 
 		return
 	}
 
-	f.state.Evolve(dt)
+	f.State.Evolve(dt)
 }
 
-func LineFragment(state physics.State, a, b physics.Point) *lineFragment {
-	relativeMidpoint := b.Add(a).Scale(.5)
-	location := state.P.Add(relativeMidpoint)
-
-	velocity := state.V.Add(randomAdjustment())
-
-	dx, dy := b.X-a.X, b.Y-a.Y
-	theta := state.Theta + math.Atan2(dy, dx)
-
-	return &lineFragment{
-		state: physics.State{
-			P:      location,
-			V:      velocity,
-			Theta:  theta,
-			Vtheta: math.Pi / 4,
-		},
-		length: b.Sub(a).Length(),
+func NewLineFragment(state physics.State, a, b pixel.Vec) *LineFragment {
+	state.Vtheta += 2*rand.Float64() - 1
+	return &LineFragment{
+		State: state,
+		a:     a,
+		b:     b,
 	}
 }
 
