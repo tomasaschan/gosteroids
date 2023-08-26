@@ -6,6 +6,8 @@ import (
 	"github.com/tomasaschan/gosteroids/game/engine"
 )
 
+const LightSpeed = 250
+
 type State struct {
 	P             Point
 	V             Point
@@ -36,4 +38,11 @@ func (s *State) Evolve(dt time.Duration) {
 	s.P.Y = evolve(s.P.Y, s.V.Y, dt)
 
 	s.Theta += s.Vtheta * dt.Seconds()
+}
+
+func (s *State) Boost(amount float64, dt time.Duration) {
+	s.V = s.V.Add(P(amount, 0).Scale(dt.Seconds()).Rotate(s.Theta))
+	if s.V.Length() > LightSpeed {
+		s.V = s.V.Scale(LightSpeed / s.V.Length())
+	}
 }

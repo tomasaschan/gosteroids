@@ -11,8 +11,9 @@ import (
 
 const (
 	missileRadius  = 5
-	missileTimeout = 4 * time.Second
-	missileSpeed   = 500 / 3
+	safetyMargin   = 20
+	missileTimeout = 2 * time.Second
+	missileSpeed   = 400
 )
 
 type missile struct {
@@ -23,7 +24,7 @@ type missile struct {
 
 func NewMissile(origin physics.State, shooterRadius float64) *missile {
 	state := origin
-	state.P = state.P.Add(physics.P(shooterRadius+missileRadius+1, 0).Rotate(state.Theta))
+	state.P = state.P.Add(physics.P(shooterRadius+missileRadius+safetyMargin, 0).Rotate(state.Theta))
 	state.V = state.V.Add(physics.P(missileSpeed, 0).Rotate(state.Theta))
 	state.Vtheta = 0
 	return &missile{state: state}

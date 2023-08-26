@@ -93,7 +93,6 @@ func (s *Ship) turnRight() {
 }
 
 func (s *Ship) boost() {
-	s.State.V = s.State.V.Add(physics.P(1, 0).Rotate(s.State.Theta).Scale(3))
 	s.boosting = true
 }
 
@@ -120,6 +119,10 @@ func (s *Ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 
 	if s.firing {
 		objects.Insert(s.createMissile())
+	}
+
+	if s.boosting {
+		s.State.Boost(120, dt)
 	}
 
 	s.State.Evolve(dt)
