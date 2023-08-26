@@ -57,8 +57,9 @@ func (e *gameEngine) Running() bool {
 
 func NewEngine(g Game) *gameEngine {
 	cfg := pixelgl.WindowConfig{
-		Title:  g.Name(),
-		Bounds: pixel.R(0, 0, ScreenSize, ScreenSize),
+		Title:    g.Name(),
+		Bounds:   pixel.R(0, 0, ScreenSize, ScreenSize),
+		Position: pixel.V(100, 100),
 		// VSync:  true,
 	}
 
