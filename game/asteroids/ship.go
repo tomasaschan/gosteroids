@@ -49,9 +49,10 @@ var _ engine.Drawable = NewShip()
 
 func (s *Ship) InteractWith(other any) {
 	if asteroid, ok := other.(*asteroid); ok {
-		if asteroid.CollidingWith(s.State.P, shipRadius) {
-			s.colliding = true
-		}
+		s.colliding = s.colliding || AreColliding(s.State, asteroid.State, missileRadius+asteroid.radius)
+	}
+	if missile, ok := other.(*missile); ok {
+		s.colliding = s.colliding || AreColliding(s.State, missile.state, missileRadius+shipRadius)
 	}
 }
 

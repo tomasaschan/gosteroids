@@ -11,8 +11,9 @@ import (
 )
 
 type asteroid struct {
-	State  physics.State
-	radius float64
+	State     physics.State
+	radius    float64
+	colliding bool
 }
 
 var _ engine.Interactor = NewAsteroid()
@@ -34,9 +35,16 @@ func NewAsteroid() *asteroid {
 }
 
 func (a *asteroid) InteractWith(other any) {
+	if m, ok := other.(*missile); ok {
+		a.colliding = a.colliding || AreColliding(a.State, m.state, a.radius+missileRadius)
+	}
 }
 
 func (a *asteroid) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+	if a.colliding {
+		objects.Remove(a)
+	}
+
 	a.State.Evolve(dt)
 }
 
@@ -47,8 +55,4 @@ func (a *asteroid) Draw(screen pixel.Target) {
 	imd.Circle(a.radius, 0)
 
 	imd.Draw(screen)
-}
-
-func (a *asteroid) CollidingWith(otherLocation physics.Point, otherRadius float64) bool {
-	return a.State.P.DistanceTo(otherLocation) < otherRadius+a.radius
 }

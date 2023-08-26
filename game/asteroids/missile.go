@@ -16,8 +16,9 @@ const (
 )
 
 type missile struct {
-	state physics.State
-	age   time.Duration
+	state     physics.State
+	age       time.Duration
+	colliding bool
 }
 
 func NewMissile(origin physics.State, shooterRadius float64) *missile {
@@ -33,16 +34,22 @@ var _ engine.Ender = NewMissile(physics.State{}, 0)
 var _ engine.Drawable = NewMissile(physics.State{}, 0)
 
 func (m *missile) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
-	if m.age > missileTimeout {
+	if m.age > missileTimeout || m.colliding {
 		objects.Remove(m)
 	}
 
+	m.colliding = false
 	m.state.Evolve(dt)
 	m.age += dt
 }
 
-func (*missile) InteractWith(any) {
-
+func (m *missile) InteractWith(other any) {
+	if asteroid, ok := other.(*asteroid); ok {
+		m.colliding = m.colliding || AreColliding(m.state, asteroid.State, missileRadius+asteroid.radius)
+	}
+	if ship, ok := other.(*Ship); ok {
+		m.colliding = m.colliding || AreColliding(m.state, ship.State, shipRadius+missileRadius)
+	}
 }
 
 func (m *missile) Draw(target pixel.Target) {
