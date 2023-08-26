@@ -38,29 +38,17 @@ func (g *GameObjects) Remove(o any) {
 	}
 }
 
-func (g *GameObjects) Pairwise() [][2]any {
-	results := make([][2]any, 0, len(g.objects)*(len(g.objects)-1))
-
-	for i, o1 := range g.objects {
-		for j, o2 := range g.objects {
-			if i != j {
-				results = append(results, [2]any{o1, o2})
-			}
-		}
-	}
-
-	return results
-}
-
 func (g *GameObjects) Update(dt time.Duration, pressedKeys []Key, justPressedKeys []Key) {
-	for _, o := range g.objects {
+	for m, o := range g.objects {
 		if b, ok := o.(Beginner); ok {
 			b.BeginUpdate()
 		}
 
-		for _, pair := range g.Pairwise() {
-			if interactor, ok := pair[0].(Interactor); ok {
-				interactor.InteractWith(pair[1])
+		if i, ok := o.(Interactor); ok {
+			for n, other := range g.objects {
+				if n != m {
+					i.InteractWith(other)
+				}
 			}
 		}
 
