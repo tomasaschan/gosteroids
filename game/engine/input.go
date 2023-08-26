@@ -14,6 +14,7 @@ const (
 	KeyLeftArrow  = Key(pixelgl.KeyLeft)
 	KeyRightArrow = Key(pixelgl.KeyRight)
 	KeyUpArrow    = Key(pixelgl.KeyUp)
+	KeySpace      = Key(pixelgl.KeySpace)
 )
 
 var keys = []Key{
@@ -21,6 +22,7 @@ var keys = []Key{
 	KeyLeftArrow,
 	KeyRightArrow,
 	KeyUpArrow,
+	KeySpace,
 }
 
 func KeyboardInput(w *pixelgl.Window) (pressedKeys []Key, justPressedKeys []Key) {

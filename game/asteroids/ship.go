@@ -32,6 +32,7 @@ type Ship struct {
 	boosting  bool
 	dropScale float64
 	colliding bool
+	firing    bool
 }
 
 func NewShip() *Ship {
@@ -55,24 +56,51 @@ func (s *Ship) InteractWith(other any) {
 }
 
 func (s *Ship) Control(pressedKeys []engine.Key, justPressedKeys []engine.Key) {
-	s.boosting = false
-	s.State.Vtheta = 0
-
 	if s.dropScale > 1 {
 		// can't control the ship before it's dropped in fully
 		return
 	}
 
+	s.resetControls()
+
 	if slices.Contains(pressedKeys, engine.KeyLeftArrow) {
-		s.State.Vtheta += math.Pi
+		s.turnLeft()
 	}
 	if slices.Contains(pressedKeys, engine.KeyRightArrow) {
-		s.State.Vtheta -= math.Pi
+		s.turnRight()
 	}
 	if slices.Contains(pressedKeys, engine.KeyUpArrow) {
-		s.State.V = s.State.V.Add(physics.P(1, 0).Rotate(s.State.Theta).Scale(3))
-		s.boosting = true
+		s.boost()
 	}
+	if slices.Contains(justPressedKeys, engine.KeySpace) {
+		s.fire()
+	}
+}
+
+func (s *Ship) resetControls() {
+	s.boosting = false
+	s.firing = false
+	s.State.Vtheta = 0
+}
+
+func (s *Ship) turnLeft() {
+	s.State.Vtheta += math.Pi
+}
+
+func (s *Ship) turnRight() {
+	s.State.Vtheta -= math.Pi
+}
+
+func (s *Ship) boost() {
+	s.State.V = s.State.V.Add(physics.P(1, 0).Rotate(s.State.Theta).Scale(3))
+	s.boosting = true
+}
+
+func (s *Ship) fire() {
+	s.firing = true
+}
+func (s *Ship) createMissile() *missile {
+	return NewMissile(s.State, shipRadius)
 }
 
 func (s *Ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
@@ -85,8 +113,12 @@ func (s *Ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 
 	if s.colliding {
 		objects.Remove(s)
-		objects.Insert(s.Eplode()...)
+		objects.Insert(s.explode()...)
 		return
+	}
+
+	if s.firing {
+		objects.Insert(s.createMissile())
 	}
 
 	s.State.Evolve(dt)
@@ -111,7 +143,7 @@ func (s *Ship) Draw(target pixel.Target) {
 	imd.Draw(target)
 }
 
-func (s *Ship) Eplode() (result []any) {
+func (s *Ship) explode() (result []any) {
 	for i := 0; i < len(ShipPoints)-1; i++ {
 		result = append(result, NewLineFragment(s.State, ShipPoints[i], ShipPoints[i+1]))
 	}
