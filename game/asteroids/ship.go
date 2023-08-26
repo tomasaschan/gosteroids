@@ -53,6 +53,11 @@ func (s *Ship) Control(pressedKeys []engine.Key, justPressedKeys []engine.Key) {
 	s.boosting = false
 	s.State.Vtheta = 0
 
+	if s.dropScale > 1 {
+		// can't control the ship before it's dropped in fully
+		return
+	}
+
 	if slices.Contains(pressedKeys, engine.KeyLeftArrow) {
 		s.State.Vtheta += math.Pi
 	}
@@ -68,8 +73,8 @@ func (s *Ship) Control(pressedKeys []engine.Key, justPressedKeys []engine.Key) {
 func (s *Ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	if s.dropScale > 1 {
 		s.dropScale -= dt.Seconds() * 100
-		return
-	} else if s.dropScale < 1 {
+	}
+	if s.dropScale < 1 {
 		s.dropScale = 1
 	}
 
@@ -93,7 +98,7 @@ func (s *Ship) Draw(target pixel.Target) {
 	imd.Push(ShipPoints...)
 	imd.Polygon(4)
 
-	if s.boosting && s.dropScale == 1 {
+	if s.boosting {
 		imd.Push(pixel.V(-15, -10), pixel.V(-35, 0), pixel.V(-15, 10))
 		imd.Polygon(4)
 	}

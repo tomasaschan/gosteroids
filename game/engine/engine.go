@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"image/color"
 	"time"
 
@@ -58,7 +59,7 @@ func NewEngine(g Game) *gameEngine {
 	cfg := pixelgl.WindowConfig{
 		Title:  g.Name(),
 		Bounds: pixel.R(0, 0, ScreenSize, ScreenSize),
-		VSync:  true,
+		// VSync:  true,
 	}
 
 	win, err := pixelgl.NewWindow(cfg)
@@ -73,11 +74,24 @@ func Run(g Game) {
 	pixelgl.Run(func() {
 		engine := NewEngine(g)
 
+		var (
+			frames = 0
+			second = time.Tick(time.Second)
+		)
+
 		last := time.Now()
 		for engine.Running() {
 			dt := time.Since(last)
 			last = time.Now()
 			engine.RunFrame(dt)
+
+			frames++
+			select {
+			case <-second:
+				engine.window.SetTitle(fmt.Sprintf("%s | %d FPS", engine.game.Name(), frames))
+				frames = 0
+			default:
+			}
 		}
 	})
 }
