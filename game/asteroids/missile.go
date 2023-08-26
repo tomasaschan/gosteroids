@@ -18,21 +18,22 @@ const (
 
 type missile struct {
 	state     physics.State
+	key       string
 	age       time.Duration
 	colliding bool
 }
 
-func NewMissile(origin physics.State, shooterRadius float64) *missile {
+func NewMissile(origin physics.State, shooterRadius float64, key string) *missile {
 	state := origin
 	state.P = state.P.Add(physics.P(shooterRadius+missileRadius+safetyMargin, 0).Rotate(state.Theta))
 	state.V = state.V.Add(physics.P(missileSpeed, 0).Rotate(state.Theta))
 	state.Vtheta = 0
-	return &missile{state: state}
+	return &missile{state: state, key: key}
 }
 
-var _ engine.Interactor = NewMissile(physics.State{}, 0)
-var _ engine.Ender = NewMissile(physics.State{}, 0)
-var _ engine.Drawable = NewMissile(physics.State{}, 0)
+var _ engine.Interactor = NewMissile(physics.State{}, 0, "")
+var _ engine.Ender = NewMissile(physics.State{}, 0, "")
+var _ engine.Drawable = NewMissile(physics.State{}, 0, "")
 
 func (m *missile) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	if m.age > missileTimeout || m.colliding {

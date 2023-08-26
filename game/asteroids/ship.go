@@ -11,7 +11,10 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-const shipRadius = 25
+const (
+	shipRadius      = 25
+	maxShipMissiles = 5
+)
 
 var ShipPoints = []pixel.Vec{
 	pixel.V(-15, -10),
@@ -28,11 +31,12 @@ var BurstPoints = []pixel.Vec{
 }
 
 type Ship struct {
-	State     physics.State
-	boosting  bool
-	dropScale float64
-	colliding bool
-	firing    bool
+	State        physics.State
+	boosting     bool
+	dropScale    float64
+	colliding    bool
+	firing       bool
+	missileCount int
 }
 
 func NewShip() *Ship {
@@ -53,6 +57,7 @@ func (s *Ship) InteractWith(other any) {
 	}
 	if missile, ok := other.(*missile); ok {
 		s.colliding = s.colliding || AreColliding(s.State, missile.state, missileRadius+shipRadius)
+		s.missileCount++
 	}
 }
 
@@ -74,7 +79,7 @@ func (s *Ship) Control(pressedKeys []engine.Key, justPressedKeys []engine.Key) {
 		s.boost()
 	}
 	if slices.Contains(justPressedKeys, engine.KeySpace) {
-		s.fire()
+		s.attempt_fire()
 	}
 }
 
@@ -96,11 +101,13 @@ func (s *Ship) boost() {
 	s.boosting = true
 }
 
-func (s *Ship) fire() {
-	s.firing = true
+func (s *Ship) attempt_fire() {
+	if s.missileCount < maxShipMissiles {
+		s.firing = true
+	}
 }
 func (s *Ship) createMissile() *missile {
-	return NewMissile(s.State, shipRadius)
+	return NewMissile(s.State, shipRadius, "ship")
 }
 
 func (s *Ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
@@ -126,6 +133,7 @@ func (s *Ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	}
 
 	s.State.Evolve(dt)
+	s.missileCount = 0
 	s.colliding = false
 }
 
