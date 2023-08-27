@@ -21,16 +21,16 @@ func NewMessage(text string, longevity time.Duration) *message {
 	}
 }
 
-var _ engine.Ender = NewMessage("", 0)
+var _ engine.Actor = NewMessage("", 0)
 var _ engine.Drawable = NewMessage("", 0)
 
-func (m *message) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (m *message) Act(dt time.Duration) engine.Result {
 	if m.age > m.longevity {
-		objects.Remove(m)
-		return
+		return engine.Result{RemoveSelf: true}
 	}
 
 	m.age += dt
+	return engine.Result{}
 }
 
 func (m *message) Draw(t pixel.Target) {

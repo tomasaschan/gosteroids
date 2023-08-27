@@ -17,7 +17,7 @@ type asteroid struct {
 }
 
 var _ engine.Interactor = NewAsteroid()
-var _ engine.Ender = NewAsteroid()
+var _ engine.Actor = NewAsteroid()
 var _ engine.Drawable = NewAsteroid()
 
 func NewAsteroid() *asteroid {
@@ -40,12 +40,13 @@ func (a *asteroid) InteractWith(other any) {
 	}
 }
 
-func (a *asteroid) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (a *asteroid) Act(dt time.Duration) engine.Result {
 	if a.colliding {
-		objects.Remove(a)
+		return engine.Result{RemoveSelf: true}
 	}
 
 	a.State.Evolve(dt)
+	return engine.Result{}
 }
 
 func (a *asteroid) Draw(screen pixel.Target) {

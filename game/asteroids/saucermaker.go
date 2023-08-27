@@ -35,7 +35,7 @@ func (s *saucerMaker) InteractWith(other any) {
 	}
 }
 
-func (s *saucerMaker) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (s *saucerMaker) Act(dt time.Duration) (result engine.Result) {
 	if !s.saucerPresent {
 		s.timer.Tick(dt, func() {
 			// objects.Insert(NewSaucer(
@@ -45,7 +45,9 @@ func (s *saucerMaker) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 		})
 	}
 	s.saucerPresent = false
+
+	return
 }
 
 var _ engine.Interactor = NewSaucerMaker()
-var _ engine.Ender = NewSaucerMaker()
+var _ engine.Actor = NewSaucerMaker()

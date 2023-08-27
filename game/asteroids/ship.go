@@ -48,7 +48,7 @@ func NewShip() *Ship {
 
 var _ engine.Interactor = NewShip()
 var _ engine.Controlled = NewShip()
-var _ engine.Ender = NewShip()
+var _ engine.Actor = NewShip()
 var _ engine.Drawable = NewShip()
 
 func (s *Ship) InteractWith(other any) {
@@ -110,7 +110,7 @@ func (s *Ship) createMissile() *missile {
 	return NewMissile(s.State, shipRadius, "ship")
 }
 
-func (s *Ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (s *Ship) Act(dt time.Duration) (result engine.Result) {
 	if s.dropScale > 1 {
 		s.dropScale -= dt.Seconds() * 100
 	}
@@ -119,13 +119,13 @@ func (s *Ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	}
 
 	if s.colliding {
-		objects.Remove(s)
-		objects.Insert(s.explode()...)
+		result.RemoveSelf = true
+		result.NewObjects = s.explode()
 		return
 	}
 
 	if s.firing {
-		objects.Insert(s.createMissile())
+		result.NewObjects = append(result.NewObjects, s.createMissile())
 	}
 
 	if s.boosting {
@@ -135,6 +135,8 @@ func (s *Ship) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	s.State.Evolve(dt)
 	s.missileCount = 0
 	s.colliding = false
+
+	return
 }
 
 func (s *Ship) Draw(target pixel.Target) {

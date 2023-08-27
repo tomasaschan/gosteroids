@@ -23,7 +23,7 @@ type waveMaker struct {
 }
 
 var _ engine.Interactor = NewWaveMaker()
-var _ engine.Ender = NewWaveMaker()
+var _ engine.Actor = NewWaveMaker()
 
 func NewAttractModeWaveMaker() *waveMaker {
 	wm := NewWaveMaker()
@@ -45,7 +45,7 @@ func (w *waveMaker) InteractWith(other any) {
 	}
 }
 
-func (w *waveMaker) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (w *waveMaker) Act(dt time.Duration) (result engine.Result) {
 	if w.anyAsteroids {
 		// there are asteroids present; reset and exit early
 		w.anyAsteroids = false
@@ -53,7 +53,7 @@ func (w *waveMaker) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 	}
 
 	if !w.attractMode && !w.messageShown {
-		objects.Insert(NewMessage(fmt.Sprint("Get ready for Wave ", w.wave), AsteroidDelay-1*time.Second))
+		result.NewObjects = append(result.NewObjects, NewMessage(fmt.Sprint("Get ready for Wave ", w.wave), AsteroidDelay-1*time.Second))
 		w.messageShown = true
 	}
 
@@ -64,11 +64,12 @@ func (w *waveMaker) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 		}
 
 		for i := 0; i < waveSize; i++ {
-			objects.Insert(NewAsteroid())
+			result.NewObjects = append(result.NewObjects, NewAsteroid())
 		}
 		w.wave++
 		w.messageShown = false
 	})
 
 	w.anyAsteroids = false
+	return
 }

@@ -15,7 +15,7 @@ type coinSlot struct {
 }
 
 var _ engine.Drawable = NewCoinSlot()
-var _ engine.Ender = NewCoinSlot()
+var _ engine.Actor = NewCoinSlot()
 var _ engine.Controlled = NewCoinSlot()
 
 func NewCoinSlot() *coinSlot { return &coinSlot{} }
@@ -26,15 +26,16 @@ func (c *coinSlot) Control(pressedKeys []engine.Key, justPressedKeys []engine.Ke
 	}
 }
 
-func (c *coinSlot) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (c *coinSlot) Act(dt time.Duration) (result engine.Result) {
 	if c.quarter {
-		objects.Clear()
-		objects.Insert(
+		result.ClearAll = true
+		result.NewObjects = []any{
 			NewWaveMaker(),
-			NewSaucerMaker(),
 			NewShipMaker(),
-		)
+		}
 	}
+
+	return
 }
 
 func (*coinSlot) Draw(screen pixel.Target) {

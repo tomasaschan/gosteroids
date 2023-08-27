@@ -20,7 +20,7 @@ type LineFragment struct {
 }
 
 var _ engine.Drawable = &LineFragment{}
-var _ engine.Ender = &LineFragment{}
+var _ engine.Actor = &LineFragment{}
 
 func (f *LineFragment) Draw(target pixel.Target) {
 	imd := imdraw.New(nil)
@@ -31,15 +31,15 @@ func (f *LineFragment) Draw(target pixel.Target) {
 	imd.Draw(target)
 }
 
-func (f *LineFragment) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (f *LineFragment) Act(dt time.Duration) engine.Result {
 	f.age += dt
 
 	if f.age > FragmentLifetime {
-		objects.Remove(f)
-		return
+		return engine.Result{RemoveSelf: true}
 	}
 
 	f.State.Evolve(dt)
+	return engine.Result{}
 }
 
 func NewLineFragment(state physics.State, a, b pixel.Vec) *LineFragment {

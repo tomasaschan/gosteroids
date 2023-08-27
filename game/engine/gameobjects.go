@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/faiface/pixel"
@@ -11,11 +12,16 @@ type GameObjects struct {
 }
 
 type Interactor interface{ InteractWith(any) }
-type Ender interface {
-	EndUpdate(dt time.Duration, objects *GameObjects)
+
+type Result struct {
+	RemoveSelf bool
+	ClearAll   bool
+	NewObjects []any
 }
+
+type Actor interface{ Act(dt time.Duration) Result }
 type Controlled interface {
-	Control(pressedKeys []Key, justPressedKeys []Key)
+	Control(pressed []Key, justPressed []Key)
 }
 
 func (g *GameObjects) Clear() {
@@ -38,6 +44,12 @@ func (g *GameObjects) Remove(o any) {
 }
 
 func (g *GameObjects) Update(dt time.Duration, pressedKeys []Key, justPressedKeys []Key) {
+	g.interact()
+	g.control(pressedKeys, justPressedKeys)
+	g.act(dt)
+}
+
+func (g *GameObjects) interact() {
 	for m, o := range g.objects {
 		if i, ok := o.(Interactor); ok {
 			for n, other := range g.objects {
@@ -46,13 +58,29 @@ func (g *GameObjects) Update(dt time.Duration, pressedKeys []Key, justPressedKey
 				}
 			}
 		}
+	}
+}
 
+func (g *GameObjects) control(pressedKeys []Key, justPressedKeys []Key) {
+	for _, o := range g.objects {
 		if e, ok := o.(Controlled); ok {
 			e.Control(pressedKeys, justPressedKeys)
 		}
+	}
+}
 
-		if e, ok := o.(Ender); ok {
-			e.EndUpdate(dt, g)
+func (g *GameObjects) act(dt time.Duration) {
+	for _, o := range g.objects {
+		if e, ok := o.(Actor); ok {
+			result := e.Act(dt)
+			if result.RemoveSelf {
+				fmt.Println("removing", o)
+				g.Remove(o)
+			}
+			if result.ClearAll {
+				g.Clear()
+			}
+			g.Insert(result.NewObjects...)
 		}
 	}
 }

@@ -21,9 +21,10 @@ func (s *saucer) Draw(target pixel.Target) {
 	graphics.TextAt(target, pixel.Vec(s.State.P), "<saucer>", 2)
 }
 
-func (s *saucer) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (s *saucer) Act(dt time.Duration) (result engine.Result) {
 	s.State.Evolve(dt)
+	return
 }
 
 var _ engine.Drawable = NewSaucer(physics.Zero, physics.Zero)
-var _ engine.Ender = NewSaucer(physics.Zero, physics.Zero)
+var _ engine.Actor = NewSaucer(physics.Zero, physics.Zero)

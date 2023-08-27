@@ -32,17 +32,18 @@ func NewMissile(origin physics.State, shooterRadius float64, key string) *missil
 }
 
 var _ engine.Interactor = NewMissile(physics.State{}, 0, "")
-var _ engine.Ender = NewMissile(physics.State{}, 0, "")
+var _ engine.Actor = NewMissile(physics.State{}, 0, "")
 var _ engine.Drawable = NewMissile(physics.State{}, 0, "")
 
-func (m *missile) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (m *missile) Act(dt time.Duration) engine.Result {
 	if m.age > missileTimeout || m.colliding {
-		objects.Remove(m)
+		return engine.Result{RemoveSelf: true}
 	}
 
 	m.colliding = false
 	m.state.Evolve(dt)
 	m.age += dt
+	return engine.Result{}
 }
 
 func (m *missile) InteractWith(other any) {

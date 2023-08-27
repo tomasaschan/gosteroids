@@ -13,21 +13,18 @@ import (
 const ShipEmergenceDelay = 3 * time.Second
 
 type shipMaker struct {
-	shipsCreated   int
-	lives          int
-	seenShip       bool
-	emergenceTimer engine.Timer
+	shipsCreated int
+	lives        int
+	seenShip     bool
+	waited       time.Duration
 }
 
 func NewShipMaker() *shipMaker {
-	return &shipMaker{
-		lives:          3,
-		emergenceTimer: engine.NewTimer(ShipEmergenceDelay),
-	}
+	return &shipMaker{lives: 3}
 }
 
 var _ engine.Interactor = NewShipMaker()
-var _ engine.Ender = NewShipMaker()
+var _ engine.Actor = NewShipMaker()
 var _ engine.Drawable = NewShipMaker()
 
 func (s *shipMaker) InteractWith(other any) {
@@ -36,19 +33,25 @@ func (s *shipMaker) InteractWith(other any) {
 	}
 }
 
-func (s *shipMaker) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
+func (s *shipMaker) Act(dt time.Duration) (result engine.Result) {
 	if !s.seenShip {
-		s.emergenceTimer.Tick(dt, func() {
-			if s.shipsCreated < s.lives {
-				s.shipsCreated++
-				objects.Insert(NewShip())
-			} else {
-				fmt.Println("game over")
-				objects.Remove(s)
-			}
-		})
+		s.waited += dt
 	}
+
+	if s.waited > ShipEmergenceDelay {
+		s.waited = 0
+		if s.shipsCreated < s.lives {
+			s.shipsCreated++
+			result.NewObjects = append(result.NewObjects, NewShip())
+		} else {
+			fmt.Println("game over")
+			result.RemoveSelf = true
+		}
+	}
+
 	s.seenShip = false
+
+	return
 }
 
 func (s *shipMaker) Draw(target pixel.Target) {
