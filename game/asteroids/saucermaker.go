@@ -25,10 +25,6 @@ func NewSaucerMaker() *saucerMaker {
 	return &saucerMaker{timer: engine.NewTimer(SaucerEmergenceTime)}
 }
 
-func (s *saucerMaker) BeginUpdate() {
-	s.saucerPresent = false
-}
-
 func (s *saucerMaker) InteractWith(other any) {
 	if s.saucerPresent {
 		return
@@ -48,8 +44,8 @@ func (s *saucerMaker) EndUpdate(dt time.Duration, objects *engine.GameObjects) {
 			// ))
 		})
 	}
+	s.saucerPresent = false
 }
 
-var _ engine.Beginner = NewSaucerMaker()
 var _ engine.Interactor = NewSaucerMaker()
 var _ engine.Ender = NewSaucerMaker()

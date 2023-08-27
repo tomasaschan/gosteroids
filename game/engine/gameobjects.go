@@ -10,7 +10,6 @@ type GameObjects struct {
 	objects []any
 }
 
-type Beginner interface{ BeginUpdate() }
 type Interactor interface{ InteractWith(any) }
 type Ender interface {
 	EndUpdate(dt time.Duration, objects *GameObjects)
@@ -40,10 +39,6 @@ func (g *GameObjects) Remove(o any) {
 
 func (g *GameObjects) Update(dt time.Duration, pressedKeys []Key, justPressedKeys []Key) {
 	for m, o := range g.objects {
-		if b, ok := o.(Beginner); ok {
-			b.BeginUpdate()
-		}
-
 		if i, ok := o.(Interactor); ok {
 			for n, other := range g.objects {
 				if n != m {
